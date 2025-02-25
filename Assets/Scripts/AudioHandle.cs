@@ -34,27 +34,42 @@ public class AudioHandle
     
     #region Chainable Methods
     
+    /// <summary>
+    ///  Set the volume of the audio source
+    /// </summary>
     public AudioHandle SetVolume(float volumeScale)
     {
         this.volumeScale = volumeScale;
         return this;
     }
 
+    /// <summary>
+    ///  Set the pitch of the audio source
+    /// </summary>
     public AudioHandle SetPitch(float pitch)
     {
         this.pitch = pitch;
         return this;
     }
+    
+    /// <summary>
+    ///  Set the audio effect for the audio source
+    /// </summary>
     public AudioHandle SetEffect(AudioEffect effect)
     {
         this.effect = effect;
         return this;
     }
+    
+    /// <summary>
+    ///  Randomizes the pitch of the audio source within a range
+    /// </summary>
     public AudioHandle RandomizePitch(float min = 0.9f, float max = 1.2f)
     {
         pitch = UnityEngine.Random.Range(min, max);
         return this;
     }
+    
     /// <summary>
     ///  Spacial Blend changes the 3D effect of the audio source (0 - 1)
     /// </summary>
@@ -63,6 +78,7 @@ public class AudioHandle
         this.spacialBlend = Mathf.Clamp(spacialBlend, 0, 1);
         return this;
     }
+    
     /// <summary>
     /// Doppler Level changes the pitch based on the velocity of audio source (0 - 5)
     /// Applies only to 3D audio sources (SpacialBlend > 0)
@@ -72,6 +88,7 @@ public class AudioHandle
         this.dopplerLevel = Mathf.Clamp(dopplerLevel, 0, 5);
         return this;
     }
+    
     /// <summary>
     ///  Follows the transform in 3D space.
     /// </summary>
@@ -81,29 +98,45 @@ public class AudioHandle
         return this;
     }
 
+    /// <summary>
+    ///  Set if the audio should loop
+    /// </summary>
     public AudioHandle SetLoop(bool loop)
     {
         useLoop = loop;
         return this;
     }
     
+    /// <summary>
+    /// Set the fade duration of the audio source (default is 0)
+    /// </summary>
     public AudioHandle SetFade(float fadeDuration)
     {
         this.fadeDuration = fadeDuration;
         return this;
     }
 
+    /// <summary>
+    /// Set the delay before playing the audio source (default is 0)
+    /// </summary>
     public AudioHandle SetDelay(float delay)
     {
         this.delay = delay;
         return this;
     }
 
+    /// <summary>
+    ///  Set the position of the audio source in 3D space
+    /// </summary>
     public AudioHandle AtPosition(Vector3 position)
     {
         this.position = position;
         return this;
     }
+    
+    /// <summary>
+    ///  Randomizes the pitch of the audio source using the MelodyGenerator
+    /// </summary>
     public AudioHandle RandomizeMelodicPitch()
     {
         int semitone = MelodyGenerator.GetNextNote();
@@ -111,6 +144,7 @@ public class AudioHandle
         pitch = Mathf.Pow(2f, semitone / 12f);
         return this;
     }
+    
     #endregion
     
     public void Play()
