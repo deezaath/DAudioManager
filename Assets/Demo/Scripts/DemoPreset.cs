@@ -7,6 +7,20 @@ public class DemoPreset : MonoBehaviour
 
     private void Start()
     {
-        AudioManager.Instance.Play(preset);
+        // Simple preset usage
+       // AudioManager.Instance.Play(preset);
+        
+        
+        // Customizing audio settings
+        
+        // var audio = AudioManager.Instance.SetPreset(preset);
+        // audio.FollowTransform(transform);
+        // audio.SetDopplerLevel(1);
+        // audio.Play();
+        
+            // OR 
+       // AudioManager.Instance.SetPreset(preset).FollowTransform(transform).SetDopplerLevel(1).Play();
+       
+       
     }
 }

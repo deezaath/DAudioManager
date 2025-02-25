@@ -33,9 +33,9 @@ public class AudioPreset : ScriptableObject
     public bool MelodicPitch = false;
     
     
-    [HideInInspector] public AudioClip LastClipPlayed = null;
     public enum ClipMode { Random, Sequential, RandomNoRepeat }
-
+    
+    [HideInInspector] private AudioClip lastClipPlayed = null;
     public AudioClip GetNextClip()
     {
         switch (Mode)
@@ -43,11 +43,11 @@ public class AudioPreset : ScriptableObject
             case ClipMode.Random:
                 return GetClip(Clips[Random.Range(0, Clips.Length)]);
             case ClipMode.Sequential:
-                return GetClip(Clips[(Array.IndexOf(Clips, LastClipPlayed) + 1) % Clips.Length]);
+                return GetClip(Clips[(Array.IndexOf(Clips, lastClipPlayed) + 1) % Clips.Length]);
             case ClipMode.RandomNoRepeat:
-                if(!LastClipPlayed) return GetClip(Clips[Random.Range(0, Clips.Length)]);
+                if(!lastClipPlayed) return GetClip(Clips[Random.Range(0, Clips.Length)]);
                 List<AudioClip> clips = Clips.ToList();
-                clips.Remove(LastClipPlayed);
+                clips.Remove(lastClipPlayed);
                 return GetClip(clips[Random.Range(0, clips.Count)]);
         }
         return null;
@@ -55,7 +55,7 @@ public class AudioPreset : ScriptableObject
 
     private AudioClip GetClip(AudioClip clip)
     {
-        LastClipPlayed = clip;
+        lastClipPlayed = clip;
         return clip;
     }
     
