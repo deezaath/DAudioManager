@@ -8,6 +8,11 @@ public class DemoAudioFollow : MonoBehaviour
 
     private void Start()
     {
-        AudioManager.Instance.SetClip(clip).FollowTransform(followTransform).SetLoop(true).SetSpacialBlend(1).Play();
+        AudioManager.Instance.
+            SetClip(clip).
+            FollowTransform(followTransform)
+            .SetLoop(true)
+            .SetSpacialBlend(0.8f)
+            .Play();
     }
 }

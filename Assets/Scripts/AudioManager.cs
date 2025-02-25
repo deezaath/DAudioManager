@@ -75,30 +75,49 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region SFX Methods
+    
 
+    
+    /// <summary>
+    /// Plays a preset using its preset parameters.
+    /// </summary>
+    public void Play(AudioPreset preset) => SetPreset(preset).Play();
+    
+    
     /// <summary>
     /// Plays a clip using default parameters.
     /// </summary>
-    public void PlayClipSimple(AudioClip clip)
-    {
-        SetClip(clip)?.Play();
-    }
+    public void Play(AudioClip clip) => SetClip(clip)?.Play();
 
     /// <summary>
     /// Plays a clip using a randomized melodic pitch.
     /// </summary>
-    public void PlayClipSimpleMelodic(AudioClip clip)
-    {
-        var handle = SetClip(clip);
-        handle?.RandomizeMelodicPitch().Play();
-    }
+    public void PlayMelodic(AudioClip clip) => SetClip(clip).RandomizeMelodicPitch().Play();
+
 
     /// <summary>
-    /// Returns an AudioHandle for chaining further options.
+    /// Creates an AudioHandle for a clip and returns it for further customization.
     /// </summary>
     public AudioHandle SetClip(AudioClip clip)
     {
         return new AudioHandle(this, clip);
+    }
+    
+    /// <summary>
+    /// Creates an AudioHandle for a preset and returns it for further customization.
+    /// </summary>
+    public AudioHandle SetPreset(AudioPreset preset)
+    {
+        var clip = AudioUtility.GetPresetClip(preset);
+        var handle = SetClip(clip);
+        handle.SetVolume(preset.VolumeScale)
+            .SetPitch(preset.Pitch)
+            .SetLoop(preset.Looped)
+            .SetFade(preset.FadeDuration)
+            .SetDelay(preset.Delay);
+        if (preset.RandomizePitch) handle.RandomizePitch(preset.MinPitch, preset.MaxPitch);
+        if(preset.MelodicPitch) handle.RandomizeMelodicPitch();
+        return handle;
     }
 
     #endregion
@@ -217,7 +236,7 @@ public class AudioManager : MonoBehaviour
             }
             else if (spatialBlend == 1 && followTransform is RectTransform)
             {
-                AudioUtility.ShowWarning("For UI elements follow,it is recommended to use spacial blend with value less than 1", _showWarnings);
+                AudioUtility.ShowWarning("For UI elements 3D follow,it is recommended to use spacial blend with value (0.7-0.9)", _showWarnings);
             }
             if(followTransform is RectTransform) dopperLevel = 0; // disable doppler effect for UI elements
             activeFollowSources.Add(source,followTransform);

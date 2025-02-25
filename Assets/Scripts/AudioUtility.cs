@@ -82,7 +82,17 @@ public static class AudioUtility
         }
         audioSource.pitch = targetPitch;
     }
-    
+
+    public static AudioClip GetPresetClip(AudioPreset preset)
+    {
+        switch (preset.Mode)
+        {
+            case AudioPreset.ClipMode.Random:
+                return preset.Clips[UnityEngine.Random.Range(0, preset.Clips.Length)];
+            // todo: add more modes
+        }
+        return null;
+    }
     public static void ShowWarning(string message,bool warningsEnabled)
     {
         if (warningsEnabled)

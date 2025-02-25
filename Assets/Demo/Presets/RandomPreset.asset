@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99f88785cc39285498a7c85918d0b81f, type: 3}
+  m_Name: RandomPreset
+  m_EditorClassIdentifier: 
+  Mode: 0
+  Clips:
+  - {fileID: 8300000, guid: 9bd6668946fc2d347844286348d7a86e, type: 3}
+  VolumeScale: 1
+  Looped: 0
+  FadeDuration: 0
+  Delay: 0
+  Pitch: 1
+  RandomizePitch: 0
+  MinPitch: 0.9
+  MaxPitch: 1.2
+  MelodicPitch: 1
