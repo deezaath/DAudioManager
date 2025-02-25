@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class AudioManager : MonoBehaviour
 {
@@ -9,7 +11,8 @@ public class AudioManager : MonoBehaviour
     #region Inspector Fields
     [Header("General Settings")]
     [SerializeField] private int _poolSize = 10;
-    [SerializeField] private bool _expandPoolIfNeeded = true;
+    [SerializeField] private bool _autoExpandPoolIfNeeded = true;
+    [SerializeField] private bool _showWarnings = true;
 
     [Header("Volume Settings")]
     [Range(0, 1)] [SerializeField] private float _masterVolume = 1;
@@ -24,9 +27,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip _defaultMusic;
     #endregion
 
-    #region Private Members
+    #region Private Fields
     private List<AudioSource> _sfxPool;
     private Transform _poolParent;
+    private Dictionary<AudioSource,Transform> activeFollowSources = new Dictionary<AudioSource, Transform>();
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -47,6 +51,21 @@ public class AudioManager : MonoBehaviour
     {
         if (_defaultMusic != null)
             PlayMusic(_defaultMusic, loop: true, fadeDuration: 5f);
+    }
+
+    private void Update()
+    {
+        for(int i = 0; i < activeFollowSources.Count; i++)
+        {
+            var source = activeFollowSources.ElementAt(i);
+            if (!source.Key.isPlaying || source.Key.clip == null || source.Value == null)
+            {
+                activeFollowSources.Remove(source.Key);
+                continue;
+            }
+            source.Key.transform.position = source.Value.position;
+        }
+        
     }
 
     private void OnDestroy()
@@ -162,7 +181,7 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// Plays an audio clip with various parameters such as volume scaling, pitch, fade duration, looping, and spatial position.
     /// </summary>
-    internal void PlayAudioInternal(AudioClip clip, float volumeScale, float pitch, float fadeDuration, bool loop, bool usePosition, Vector3 position)
+    internal void PlayAudioInternal(AudioClip clip, float volumeScale, float pitch, float fadeDuration, bool loop,Vector3 position,float spatialBlend,Transform followTransform,float dopperLevel)
     {
         if (clip == null)
             return;
@@ -170,14 +189,14 @@ public class AudioManager : MonoBehaviour
         AudioSource source = GetPooledSource();
         if (source == null)
         {
-            if (_expandPoolIfNeeded)
+            if (_autoExpandPoolIfNeeded)
             {
                 source = CreatePooledSource();
                 _sfxPool.Add(source);
             }
             else
             {
-                Debug.LogWarning("No available audio sources in the pool");
+                Debug.LogError("No available audio sources in the pool, consider expanding the pool size or enabling auto-expansion.");
                 return;
             }
         }
@@ -189,16 +208,36 @@ public class AudioManager : MonoBehaviour
         source.loop = loop;
         source.pitch = finalPitch;
 
-        if (usePosition)
+        if (followTransform != null)
+        {
+            source.transform.position = followTransform.position;
+            if (spatialBlend == 0)
+            {
+                AudioUtility.ShowWarning("Audio Follow transform is set but spatial blend is 2D. To use 3D, add SetSpatialBlend() with value > 0", _showWarnings);
+            }
+            else if (spatialBlend == 1 && followTransform is RectTransform)
+            {
+                AudioUtility.ShowWarning("For UI elements follow,it is recommended to use spacial blend with value less than 1", _showWarnings);
+            }
+            if(followTransform is RectTransform) dopperLevel = 0; // disable doppler effect for UI elements
+            activeFollowSources.Add(source,followTransform);
+        }
+        if (position != Vector3.zero)
         {
             source.transform.position = position;
-            source.spatialBlend = 1f; // 3D
+            if (spatialBlend == 0)
+            {
+                AudioUtility.ShowWarning("Audio Position is set but spatial blend is 2D. To use 3D, add SetSpatialBlend() with value > 0", _showWarnings);
+            }
         }
         else
         {
             source.transform.position = transform.position;
-            source.spatialBlend = 0f; // 2D
+            source.spatialBlend = spatialBlend;
         }
+        source.dopplerLevel = dopperLevel;
+        
+        
 
         if (fadeDuration > 0)
             FadeInSource(source, fadeDuration, finalVolume);

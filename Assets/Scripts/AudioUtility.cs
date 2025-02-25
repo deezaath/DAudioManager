@@ -82,4 +82,12 @@ public static class AudioUtility
         }
         audioSource.pitch = targetPitch;
     }
+    
+    public static void ShowWarning(string message,bool warningsEnabled)
+    {
+        if (warningsEnabled)
+        {
+            Debug.LogWarning($"<color=#FFF288><b>[DAudioManager]</b></color> <b>{message}</b>");
+        }
+    }
 }
