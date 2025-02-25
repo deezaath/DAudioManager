@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [CreateAssetMenu(fileName = "AudioPreset", menuName = "DAudioManager/Audio Preset")]
 public class AudioPreset : ScriptableObject
@@ -28,6 +32,31 @@ public class AudioPreset : ScriptableObject
     [Tooltip("Melodic pitch will use MelodyGenerator to determine pitch")]
     public bool MelodicPitch = false;
     
-    public enum ClipMode { Random }
+    
+    [HideInInspector] public AudioClip LastClipPlayed = null;
+    public enum ClipMode { Random, Sequential, RandomNoRepeat }
+
+    public AudioClip GetNextClip()
+    {
+        switch (Mode)
+        {
+            case ClipMode.Random:
+                return GetClip(Clips[Random.Range(0, Clips.Length)]);
+            case ClipMode.Sequential:
+                return GetClip(Clips[(Array.IndexOf(Clips, LastClipPlayed) + 1) % Clips.Length]);
+            case ClipMode.RandomNoRepeat:
+                if(!LastClipPlayed) return GetClip(Clips[Random.Range(0, Clips.Length)]);
+                List<AudioClip> clips = Clips.ToList();
+                clips.Remove(LastClipPlayed);
+                return GetClip(clips[Random.Range(0, clips.Count)]);
+        }
+        return null;
+    }
+
+    private AudioClip GetClip(AudioClip clip)
+    {
+        LastClipPlayed = clip;
+        return clip;
+    }
     
 }

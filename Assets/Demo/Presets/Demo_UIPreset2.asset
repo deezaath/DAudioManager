@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99f88785cc39285498a7c85918d0b81f, type: 3}
-  m_Name: RandomPreset
+  m_Name: Demo_UIPreset2
   m_EditorClassIdentifier: 
   Mode: 0
   Clips:

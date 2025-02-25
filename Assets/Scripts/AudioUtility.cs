@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class AudioUtility
@@ -81,17 +82,6 @@ public static class AudioUtility
             yield return null;
         }
         audioSource.pitch = targetPitch;
-    }
-
-    public static AudioClip GetPresetClip(AudioPreset preset)
-    {
-        switch (preset.Mode)
-        {
-            case AudioPreset.ClipMode.Random:
-                return preset.Clips[UnityEngine.Random.Range(0, preset.Clips.Length)];
-            // todo: add more modes
-        }
-        return null;
     }
     public static void ShowWarning(string message,bool warningsEnabled)
     {

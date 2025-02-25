@@ -108,7 +108,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public AudioHandle SetPreset(AudioPreset preset)
     {
-        var clip = AudioUtility.GetPresetClip(preset);
+        var clip = preset.GetNextClip();
         var handle = SetClip(clip);
         handle.SetVolume(preset.VolumeScale)
             .SetPitch(preset.Pitch)
