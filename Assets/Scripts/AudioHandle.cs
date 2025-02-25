@@ -23,6 +23,8 @@ public class AudioHandle
     
     private float dopplerLevel = 0f;
     
+    private AudioEffect effect = AudioEffect.None;
+    
     
     public AudioHandle(AudioManager manager, AudioClip clip)
     {
@@ -41,6 +43,11 @@ public class AudioHandle
     public AudioHandle SetPitch(float pitch)
     {
         this.pitch = pitch;
+        return this;
+    }
+    public AudioHandle SetEffect(AudioEffect effect)
+    {
+        this.effect = effect;
         return this;
     }
     public AudioHandle RandomizePitch(float min = 0.9f, float max = 1.2f)
@@ -112,12 +119,13 @@ public class AudioHandle
         {
             AudioUtility.DelayedCall(delay, () =>
             {
-                manager.PlayAudioInternal(clip,volumeScale,pitch,fadeDuration,useLoop,position,spacialBlend,followTransform,dopplerLevel);
+                manager.PlayAudioInternal(clip,volumeScale,pitch,fadeDuration,useLoop,position,spacialBlend,followTransform,dopplerLevel,effect);
             },manager);
         }
         else
         {
-            manager.PlayAudioInternal(clip, volumeScale, pitch, fadeDuration, useLoop,position, spacialBlend, followTransform,dopplerLevel);
+            manager.PlayAudioInternal(clip, volumeScale, pitch, fadeDuration, useLoop,position, spacialBlend, followTransform,dopplerLevel,effect);
         }
     }
 }
+public enum AudioEffect { None, Muffled, Robot,Echo,Cave,Chorus}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -114,7 +115,9 @@ public class AudioManager : MonoBehaviour
             .SetPitch(preset.Pitch)
             .SetLoop(preset.Looped)
             .SetFade(preset.FadeDuration)
-            .SetDelay(preset.Delay);
+            .SetDelay(preset.Delay)
+            .SetEffect(preset.Effect);
+        
         if (preset.RandomizePitch) handle.RandomizePitch(preset.MinPitch, preset.MaxPitch);
         if(preset.MelodicPitch) handle.RandomizeMelodicPitch();
         return handle;
@@ -163,7 +166,36 @@ public class AudioManager : MonoBehaviour
         else
             _musicSource.Stop();
     }
+    /// <summary>
+    ///  Temporarily lowers the music volume to a specified level for a set duration, then restores it.
+    /// </summary>
+    public void DuckMusic(float duckedVolume, float duration)
+    {
+        AudioUtility.TweenVolume(_musicSource, duckedVolume, duration, this);
+        // After a delay, restore the original volume.
+        AudioUtility.DelayedCall(duration, () => {
+            _musicSource.volume = _masterVolume * _musicVolume;
+        }, this);
+    }
 
+    /// <summary>
+    ///  Crossfades between the current music clip and a new one over a specified duration.
+    /// </summary>
+    public void CrossfadeMusic(AudioClip newClip, float crossfadeDuration)
+    {
+        AudioSource newMusicSource = gameObject.AddComponent<AudioSource>();
+        newMusicSource.clip = newClip;
+        newMusicSource.loop = true;
+        newMusicSource.pitch = _masterPitch;
+        newMusicSource.volume = 0;
+        newMusicSource.Play();
+        
+        AudioUtility.FadeOut(_musicSource, crossfadeDuration, this);
+        AudioUtility.FadeIn(newMusicSource, crossfadeDuration, _masterVolume * _musicVolume, this);
+        
+        StartCoroutine(SwitchMusicSourceAfterDelay(newMusicSource, crossfadeDuration));
+    }
+    
     /// <summary>
     /// Applies a slow-motion effect by tweening the pitch.
     /// </summary>
@@ -178,20 +210,17 @@ public class AudioManager : MonoBehaviour
         if (_musicSource != null && _musicSource.isPlaying)
             AudioUtility.TweenPitch(_musicSource, newPitch, duration, this);
     }
-
     /// <summary>
-    /// Resets the pitch to the master pitch value.
+    ///  Helper coroutine to switch the music source after a delay.
     /// </summary>
-    public void ResetPitch()
+    private IEnumerator SwitchMusicSourceAfterDelay(AudioSource newMusicSource, float crossfadeDuration)
     {
-        float duration = 0.25f;
-        foreach (var source in GetPlayingSources())
-        {
-            AudioUtility.TweenPitch(source, _masterPitch, duration, this);
-        }
-        if (_musicSource != null && _musicSource.isPlaying)
-            AudioUtility.TweenPitch(_musicSource, _masterPitch, duration, this);
+        yield return new WaitForSeconds(crossfadeDuration);
+        Destroy(_musicSource);
+        _musicSource = newMusicSource;
     }
+
+
 
     #endregion
 
@@ -200,7 +229,7 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// Plays an audio clip with various parameters such as volume scaling, pitch, fade duration, looping, and spatial position.
     /// </summary>
-    internal void PlayAudioInternal(AudioClip clip, float volumeScale, float pitch, float fadeDuration, bool loop,Vector3 position,float spatialBlend,Transform followTransform,float dopperLevel)
+    internal void PlayAudioInternal(AudioClip clip, float volumeScale, float pitch, float fadeDuration, bool loop,Vector3 position,float spatialBlend,Transform followTransform,float dopperLevel,AudioEffect effect)
     {
         if (clip == null)
             return;
@@ -223,6 +252,11 @@ public class AudioManager : MonoBehaviour
         float finalVolume = _masterVolume * _sfxVolume * volumeScale;
         float finalPitch = Mathf.Abs(pitch - 1f) > 0.01f ? pitch : _masterPitch;
 
+        RemoveEffects(source);
+        if (effect != AudioEffect.None)
+            ApplyEffect(source, effect);
+        
+        
         source.clip = clip;
         source.loop = loop;
         source.pitch = finalPitch;
@@ -284,11 +318,27 @@ public class AudioManager : MonoBehaviour
     {
         AudioUtility.FadeOut(source, duration, this);
     }
-
+    
+    /// <summary>
+    /// Disables any audio effects from the source.
+    /// </summary>
+    private void RemoveEffects(AudioSource source)
+    {
+        AudioUtility.RemoveAudioFilters(source);
+    }
+    
+    /// <summary>
+    /// Applies an audio effect to the source.
+    /// </summary>
+    private void ApplyEffect(AudioSource source, AudioEffect effect)
+    {
+        AudioUtility.ApplyAudioFilter(source, effect);
+    }
     #endregion
 
     #region Volume & Pool Management
 
+    
     public void SetMasterVolume(float volume)
     {
         _masterVolume = Mathf.Clamp01(volume);
@@ -305,6 +355,20 @@ public class AudioManager : MonoBehaviour
     {
         _musicVolume = Mathf.Clamp01(volume);
         UpdateAudioProperties();
+    }
+    
+    /// <summary>
+    /// Resets the pitch to the master pitch value.
+    /// </summary>
+    public void ResetPitch()
+    {
+        float duration = 0.25f;
+        foreach (var source in GetPlayingSources())
+        {
+            AudioUtility.TweenPitch(source, _masterPitch, duration, this);
+        }
+        if (_musicSource != null && _musicSource.isPlaying)
+            AudioUtility.TweenPitch(_musicSource, _masterPitch, duration, this);
     }
 
     /// <summary>

@@ -17,6 +17,7 @@ public class AudioPreset : ScriptableObject
     public bool Looped = false;
     public float FadeDuration = 0f;
     public float Delay = 0f;
+    public AudioEffect Effect = AudioEffect.None;
     
     [Header("Pitch Settings")]
     public float Pitch = 1f;

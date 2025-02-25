@@ -19,6 +19,7 @@ MonoBehaviour:
   Looped: 0
   FadeDuration: 0
   Delay: 0
+  Effect: 0
   Pitch: 1
   RandomizePitch: 0
   MinPitch: 0.9

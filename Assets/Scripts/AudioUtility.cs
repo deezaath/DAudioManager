@@ -70,6 +70,96 @@ public static class AudioUtility
     {
         runner.StartCoroutine(TweenPitchCoroutine(audioSource, targetPitch, duration));
     }
+    
+    /// <summary>
+    /// Tweens the volume of an AudioSource to the targetVolume over duration (in seconds).
+    /// </summary>
+    public static void TweenVolume(AudioSource audioSource, float targetVolume, float duration, MonoBehaviour runner)
+    {
+        runner.StartCoroutine(TweenVolumeCoroutine(audioSource, targetVolume, duration));
+    }
+    public static void ApplyAudioFilter(AudioSource source, AudioEffect effect)
+    {
+        switch (effect)
+        {
+            case AudioEffect.None:
+                break;
+            
+            case AudioEffect.Muffled:
+                AudioLowPassFilter lowPass = source.GetComponent<AudioLowPassFilter>();
+                if (lowPass == null)
+                    lowPass = source.gameObject.AddComponent<AudioLowPassFilter>();
+                
+                lowPass.enabled = true;
+                lowPass.cutoffFrequency = 800f; 
+                break;
+
+            case AudioEffect.Robot:
+                AudioDistortionFilter distortion = source.GetComponent<AudioDistortionFilter>();
+                if (distortion == null)
+                    distortion = source.gameObject.AddComponent<AudioDistortionFilter>();
+                
+                distortion.enabled = true;
+                distortion.distortionLevel = 0.5f;
+                break;
+            
+            case AudioEffect.Echo:
+                AudioEchoFilter echo = source.GetComponent<AudioEchoFilter>();
+                if (echo == null)
+                    echo = source.gameObject.AddComponent<AudioEchoFilter>();
+                
+                echo.enabled = true;
+                echo.delay = 500f;  
+                echo.decayRatio = 0.5f;
+                echo.wetMix = 1f;
+                echo.dryMix = 1f;
+                break;
+            
+            case AudioEffect.Cave:
+                AudioReverbFilter reverb = source.GetComponent<AudioReverbFilter>();
+                if (reverb == null)
+                    reverb = source.gameObject.AddComponent<AudioReverbFilter>();
+                
+                reverb.enabled = true;
+                reverb.reverbPreset = AudioReverbPreset.Cave;
+                break;
+            
+            case AudioEffect.Chorus:
+                AudioChorusFilter chorus = source.GetComponent<AudioChorusFilter>();
+                if (chorus == null)
+                    chorus = source.gameObject.AddComponent<AudioChorusFilter>();
+                
+                chorus.enabled = true;
+                chorus.delay = 40f;
+                chorus.rate = 0.8f;
+                chorus.depth = 0.7f;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(effect), effect, null);
+        }
+    }
+    public static void RemoveAudioFilters(AudioSource source)
+    {
+        AudioLowPassFilter lowPass = source.GetComponent<AudioLowPassFilter>();
+        if (lowPass != null)
+            lowPass.enabled = false;
+    
+        AudioReverbFilter reverb = source.GetComponent<AudioReverbFilter>();
+        if (reverb != null)
+            reverb.enabled = false;
+    
+        AudioDistortionFilter distortion = source.GetComponent<AudioDistortionFilter>();
+        if (distortion != null)
+            distortion.enabled = false;
+    
+        AudioEchoFilter echo = source.GetComponent<AudioEchoFilter>();
+        if (echo != null)
+            echo.enabled = false;
+    
+        AudioChorusFilter chorus = source.GetComponent<AudioChorusFilter>();
+        if (chorus != null)
+            chorus.enabled = false;
+    }
 
     private static IEnumerator TweenPitchCoroutine(AudioSource audioSource, float targetPitch, float duration)
     {
@@ -82,6 +172,18 @@ public static class AudioUtility
             yield return null;
         }
         audioSource.pitch = targetPitch;
+    }
+    private static IEnumerator TweenVolumeCoroutine(AudioSource audioSource, float targetVolume, float duration)
+    {
+        float startVolume = audioSource.volume;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, targetVolume, elapsed / duration);
+            yield return null;
+        }
+        audioSource.volume = targetVolume;
     }
     public static void ShowWarning(string message,bool warningsEnabled)
     {
