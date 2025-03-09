@@ -4,8 +4,9 @@ Features:
 1. Audio Pooling 
 2. Chainable methods to tweak audio settings like volume,pitch, fade, 3d settings and more
 3. Methods like RandomizePitch,RandomizeMelodicPitch, Follow object, Delay
-4. Music crossfade
-5. Audio Presets -  you can create audio presets (scriptable objects) and use that instead of audio clips.
+4. AudioEffects methods like Muffled,Echo,Robot,Cave,Chorus
+5. Music crossfade
+6. Audio Presets -  you can create audio presets (scriptable objects) and use that instead of audio clips.
 Presets can be especially helpful in things like UI. You simply call the AudioManager and pass the preset.
 
 https://github.com/user-attachments/assets/5fc544ef-5bf9-4752-ac26-b4702eef7b50
