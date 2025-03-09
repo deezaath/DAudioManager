@@ -7,6 +7,7 @@ Features:
 4. Music crossfade
 5. Audio Presets -  you can create audio presets (scriptable objects) and use that instead of audio clips.
 Presets can be especially helpful in things like UI. You simply call the AudioManager and pass the preset.
+
 https://github.com/user-attachments/assets/5fc544ef-5bf9-4752-ac26-b4702eef7b50
 
 Example of playing a audioclip:
