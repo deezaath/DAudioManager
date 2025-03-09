@@ -5,7 +5,7 @@ Features:
 2. Chainable methods to tweak audio settings like volume,pitch, fade, 3d settings and more
 3. Methods like RandomizePitch,RandomizeMelodicPitch, Follow object, Delay
 4. AudioEffects methods like Muffled,Echo,Robot,Cave,Chorus
-5. Music crossfade
+5. Music methods and crossfade
 6. Audio Presets -  you can create audio presets (scriptable objects) and use that instead of audio clips.
 Presets can be especially helpful in things like UI. You simply call the AudioManager and pass the preset.
 
@@ -16,6 +16,7 @@ Example of playing a audioclip:
 ![preset2](https://github.com/user-attachments/assets/a5f51a6d-038b-40c1-83cd-025acadd2233)
 
 Music methods:
+
 ![musicMethods](https://github.com/user-attachments/assets/cd8a10ed-2354-4d17-a5a8-735df43b1b74)
 
 Playing audio preset / adding additional methods on top of audio preset
